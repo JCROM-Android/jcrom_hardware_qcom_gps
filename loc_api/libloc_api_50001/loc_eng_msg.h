@@ -49,11 +49,11 @@ struct loc_eng_msg {
     inline loc_eng_msg(void* instance, int id) :
         owner(instance), msgid(id)
     {
-        LOC_LOGV("creating msg %s", loc_get_msg_name(msgid));
+        
     }
     virtual ~loc_eng_msg()
     {
-        LOC_LOGV("deleting msg %s", loc_get_msg_name(msgid));
+        
     }
 };
 
@@ -63,7 +63,7 @@ struct loc_eng_msg_suple_version : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_SUPL_VERSION),
         supl_version(version)
         {
-            LOC_LOGV("SUPL Version: %d", version);
+            
         }
 };
 
@@ -73,7 +73,7 @@ struct loc_eng_msg_sensor_control_config : public loc_eng_msg {
             loc_eng_msg(instance, LOC_ENG_MSG_SET_SENSOR_CONTROL_CONFIG),
             sensorsDisabled(disabled)
         {
-            LOC_LOGV("Sensors Disabled: %d", disabled);
+            
         }
 };
 
@@ -83,7 +83,7 @@ struct loc_eng_msg_sensor_properties : public loc_eng_msg {
             loc_eng_msg(instance, LOC_ENG_MSG_SET_SENSOR_PROPERTIES),
             gyroBiasVarianceRandomWalk(gyroBiasRandomWalk)
         {
-            LOC_LOGV("Gyro Bias Random Walk: %f", gyroBiasRandomWalk);
+            
         }
 };
 
@@ -103,14 +103,7 @@ struct loc_eng_msg_sensor_perf_control_config : public loc_eng_msg {
             gyroSamplesPerBatch(gyroSamplesPerBatch),
             gyroBatchesPerSec(gyroBatchesPerSec)
         {
-            LOC_LOGV("Sensor Perf Control Config (performanceControlMode)(%u) "
-                "accel(#smp,#batches) (%u,%u) gyro(#smp,#batches) (%u,%u)\n",
-                controlMode,
-                accelSamplesPerBatch,
-                accelBatchesPerSec,
-                gyroSamplesPerBatch,
-                gyroBatchesPerSec
-                );
+            
         }
 };
 
@@ -136,12 +129,7 @@ struct loc_eng_msg_position_mode : public loc_eng_msg {
         pMode(mode), pRecurrence(recurrence), minInterval(min_interval),
         preferredAccuracy(preferred_accuracy), preferredTime(preferred_time)
     {
-        LOC_LOGV("Position mode: %s\n  Position recurrence: %s\n  min interval: %d\n  preferred accuracy: %d\n  preferred time: %d",
-                 loc_get_position_mode_name(pMode),
-                 loc_get_position_recurrence_name(pRecurrence),
-                 minInterval,
-                 preferredAccuracy,
-                 preferredTime);
+        
     }
 };
 
@@ -156,8 +144,7 @@ struct loc_eng_msg_set_time : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_SET_TIME),
         time(t), timeReference(tf), uncertainty(unc)
     {
-        LOC_LOGV("time: %lld\n  timeReference: %lld\n  uncertainty: %d",
-                 time, timeReference, uncertainty);
+        
     }
 };
 
@@ -170,8 +157,7 @@ struct loc_eng_msg_inject_location : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_INJECT_LOCATION),
         latitude(lat), longitude(longi), accuracy(accur)
     {
-        LOC_LOGV("latitude: %f\n  longitude: %f\n  accuracy: %f",
-                 latitude, longitude, accuracy);
+        
     }
 };
 
@@ -180,7 +166,7 @@ struct loc_eng_msg_delete_aiding_data : public loc_eng_msg {
     inline loc_eng_msg_delete_aiding_data(void* instance, GpsAidingData data) :
         loc_eng_msg(instance, LOC_ENG_MSG_DELETE_AIDING_DATA), type(data)
     {
-        LOC_LOGV("aiding data msak %d", type);
+        
     }
 };
 
@@ -194,16 +180,9 @@ struct loc_eng_msg_report_position : public loc_eng_msg {
         location(loc), locationExt(locExt), status(st)
     {
 #ifdef QCOM_FEATURE_ULP
-        LOC_LOGV("flags: %d\n  source: %d\n  latitude: %f\n  longitude: %f\n  altitude: %f\n  speed: %f\n  bearing: %f\n  accuracy: %f\n  timestamp: %lld\n  rawDataSize: %d\n  rawData: %p\n  Session status: %s",
-                 location.flags, location.position_source, location.latitude, location.longitude,
-                 location.altitude, location.speed, location.bearing, location.accuracy,
-                 location.timestamp, location.rawDataSize, location.rawData,
-                 loc_get_position_sess_status_name(status));
+        
 #else
-        LOC_LOGV("flags: %d\n  latitude: %f\n  longitude: %f\n  altitude: %f\n  speed: %f\n  bearing: %f\n  accuracy: %f\n  timestamp: %lld\n  Session status: %s",
-                 location.flags, location.latitude, location.longitude,
-                 location.altitude, location.speed, location.bearing, location.accuracy,
-                 location.timestamp, loc_get_position_sess_status_name(status));
+        
 #endif
     }
 };
@@ -214,15 +193,9 @@ struct loc_eng_msg_report_sv : public loc_eng_msg {
     inline loc_eng_msg_report_sv(void* instance, GpsSvStatus &sv, void* ext) :
         loc_eng_msg(instance, LOC_ENG_MSG_REPORT_SV), svStatus(sv), svExt(ext)
     {
-        LOC_LOGV("num sv: %d\n  ephemeris mask: %dxn  almanac mask: %x\n  used in fix mask: %x\n      sv: prn         snr       elevation      azimuth",
-                 svStatus.num_svs, svStatus.ephemeris_mask, svStatus.almanac_mask, svStatus.used_in_fix_mask);
+        
         for (int i = 0; i < svStatus.num_svs && i < GPS_MAX_SVS; i++) {
-            LOC_LOGV("   %d:   %d    %f    %f    %f\n  ",
-                     i,
-                     svStatus.sv_list[i].prn,
-                     svStatus.sv_list[i].snr,
-                     svStatus.sv_list[i].elevation,
-                     svStatus.sv_list[i].azimuth);
+            
         }
     }
 };
@@ -232,7 +205,7 @@ struct loc_eng_msg_report_status : public loc_eng_msg {
     inline loc_eng_msg_report_status(void* instance, GpsStatusValue engineStatus) :
         loc_eng_msg(instance, LOC_ENG_MSG_REPORT_STATUS), status(engineStatus)
     {
-        LOC_LOGV("status: %s", loc_get_gps_status_name(status));
+        
     }
 };
 
@@ -246,8 +219,7 @@ struct loc_eng_msg_report_nmea : public loc_eng_msg {
         nmea(new char[len]), length(len)
     {
         memcpy((void*)nmea, (void*)data, len);
-        LOC_LOGV("length: %d\n  nmea: %p - %c%c%c",
-                 length, nmea, nmea[3], nmea[4], nmea[5]);
+        
     }
     inline ~loc_eng_msg_report_nmea()
     {
@@ -269,12 +241,7 @@ struct loc_eng_msg_request_bit : public loc_eng_msg {
     {
         if (NULL != ipv6Addr)
             memcpy(ipv6Addr, ipv6, 16);
-        LOC_LOGV("isSupl: %d, ipv4: %d.%d.%d.%d, ipv6: %s", isSupl,
-                 (unsigned char)ipv4>>24,
-                 (unsigned char)ipv4>>16,
-                 (unsigned char)ipv4>>8,
-                 (unsigned char)ipv4,
-                 NULL != ipv6Addr ? ipv6Addr : "");
+        
     }
 
     inline ~loc_eng_msg_request_bit()
@@ -299,12 +266,7 @@ struct loc_eng_msg_release_bit : public loc_eng_msg {
     {
         if (NULL != ipv6Addr)
             memcpy(ipv6Addr, ipv6, 16);
-        LOC_LOGV("isSupl: %d, ipv4: %d.%d.%d.%d, ipv6: %s", isSupl,
-                 (unsigned char)ipv4>>24,
-                 (unsigned char)ipv4>>16,
-                 (unsigned char)ipv4>>8,
-                 (unsigned char)ipv4,
-                 NULL != ipv6Addr ? ipv6Addr : "");
+        
     }
 
     inline ~loc_eng_msg_release_bit()
@@ -323,9 +285,7 @@ struct loc_eng_msg_request_atl : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_REQUEST_ATL),
         handle(hndl), type(agps_type)
     {
-        LOC_LOGV("handle: %d\n  agps type: %s",
-                 handle,
-                 loc_get_agps_type_name(type));
+        
     }
 };
 
@@ -334,7 +294,7 @@ struct loc_eng_msg_release_atl : public loc_eng_msg {
     inline loc_eng_msg_release_atl(void* instance, int hndl) :
         loc_eng_msg(instance, LOC_ENG_MSG_RELEASE_ATL), handle(hndl)
     {
-        LOC_LOGV("handle: %d", handle);
+        
     }
 };
 
@@ -346,15 +306,7 @@ struct loc_eng_msg_request_ni : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_REQUEST_NI),
         notify(notif), passThroughData(data)
     {
-        LOC_LOGV("id: %d\n  type: %s\n  flags: %d\n  time out: %d\n  default response: %s\n  requestor id encoding: %s\n  text encoding: %s\n  passThroughData: %p",
-                 notify.notification_id,
-                 loc_get_ni_type_name(notify.ni_type),
-                 notify.notify_flags,
-                 notify.timeout,
-                 loc_get_ni_response_name(notify.default_response),
-                 loc_get_ni_encoding_name(notify.requestor_id_encoding),
-                 loc_get_ni_encoding_name(notify.text_encoding),
-                 passThroughData);
+        
     }
 };
 
@@ -367,9 +319,7 @@ struct loc_eng_msg_inform_ni_response : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_INFORM_NI_RESPONSE),
         response(resp), passThroughData(data)
     {
-        LOC_LOGV("response: %s\n  passThroughData: %p",
-                 loc_get_ni_response_name(response),
-                 passThroughData);
+        
     }
     inline ~loc_eng_msg_inform_ni_response()
     {
@@ -391,7 +341,7 @@ struct loc_eng_msg_set_apn : public loc_eng_msg {
     {
         memcpy((void*)apn, (void*)name, len);
         apn[len] = 0;
-        LOC_LOGV("apn: %s", apn);
+        
     }
     inline ~loc_eng_msg_set_apn()
     {
@@ -412,7 +362,7 @@ struct loc_eng_msg_set_server_ipv4 : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_SET_SERVER_IPV4),
         nl_addr(ip), port(p), serverType(type)
     {
-        LOC_LOGV("addr: %x\n  , port: %d\n type: %s", nl_addr, port, loc_get_server_type_name(serverType));
+        
     }
 };
 
@@ -428,7 +378,7 @@ struct loc_eng_msg_set_server_url : public loc_eng_msg {
     {
         memcpy((void*)url, (void*)urlString, url_len);
         url[len] = 0;
-        LOC_LOGV("url: %s", url);
+        
     }
     inline ~loc_eng_msg_set_server_url()
     {
@@ -444,7 +394,7 @@ struct loc_eng_msg_inject_xtra_data : public loc_eng_msg {
         data(new char[l]), length(l)
     {
         memcpy((void*)data, (void*)d, l);
-        LOC_LOGV("length: %d\n  data: %p", length, data);
+        
     }
     inline ~loc_eng_msg_inject_xtra_data()
     {
@@ -469,10 +419,7 @@ struct loc_eng_msg_atl_open_success : public loc_eng_msg {
     {
         memcpy((void*)apn, (void*)name, len);
         apn[len] = 0;
-        LOC_LOGV("agps type: %s\n  apn: %s\n  bearer type: %s",
-                 loc_get_agps_type_name(agpsType),
-                 apn,
-                 loc_get_agps_bear_name(bearerType));
+        
     }
     inline ~loc_eng_msg_atl_open_success()
     {
@@ -492,8 +439,7 @@ struct loc_eng_msg_atl_open_success : public loc_eng_msg {
     {
         memcpy((void*)apn, (void*)name, len);
         apn[len] = 0;
-        LOC_LOGV("apn: %s\n",
-                 apn);
+        
     }
     inline ~loc_eng_msg_atl_open_success()
     {
@@ -510,8 +456,7 @@ struct loc_eng_msg_atl_open_failed : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_ATL_OPEN_FAILED),
         agpsType(atype)
     {
-        LOC_LOGV("agps type %s",
-                 loc_get_agps_type_name(agpsType));
+        
     }
 };
 #else
@@ -519,7 +464,7 @@ struct loc_eng_msg_atl_open_failed : public loc_eng_msg {
     inline loc_eng_msg_atl_open_failed(void* instance) :
         loc_eng_msg(instance, LOC_ENG_MSG_ATL_OPEN_FAILED)
     {
-        LOC_LOGV("");
+        
     }
 };
 #endif
@@ -532,8 +477,7 @@ struct loc_eng_msg_atl_closed : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_ATL_CLOSED),
         agpsType(atype)
     {
-        LOC_LOGV("agps type %s",
-                 loc_get_agps_type_name(agpsType));
+        
     }
 };
 #else
@@ -541,7 +485,7 @@ struct loc_eng_msg_atl_closed : public loc_eng_msg {
     inline loc_eng_msg_atl_closed(void* instance) :
         loc_eng_msg(instance, LOC_ENG_MSG_ATL_CLOSED)
     {
-        LOC_LOGV("");
+        
     }
 };
 #endif
@@ -559,7 +503,7 @@ struct loc_eng_msg_set_data_enable : public loc_eng_msg {
     {
         memcpy((void*)apn, (void*)name, len);
         apn[len] = 0;
-        LOC_LOGV("apn: %s\n  enable: %d", apn, enable);
+        
     }
     inline ~loc_eng_msg_set_data_enable()
     {

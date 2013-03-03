@@ -51,7 +51,7 @@ static int loc_api_server_proc_init(void *context)
     loc_api_server_msgqid = loc_eng_dmn_conn_glue_msgget(global_loc_api_q_path, O_RDWR);
     loc_api_resp_msgqid = loc_eng_dmn_conn_glue_msgget(global_loc_api_resp_q_path, O_RDWR);
 
-    LOC_LOGD("%s:%d] loc_api_server_msgqid = %d\n", __func__, __LINE__, loc_api_server_msgqid);
+    
     return 0;
 }
 
@@ -72,20 +72,20 @@ static int loc_api_server_proc(void *context)
     p_cmsgbuf = (struct ctrl_msgbuf *) malloc(sz);
 
     if (!p_cmsgbuf) {
-        LOC_LOGE("%s:%d] Out of memory\n", __func__, __LINE__);
+        
         return -1;
     }
 
     cnt ++;
-    LOC_LOGD("%s:%d] %d listening on %s...\n", __func__, __LINE__, cnt, (char *) context);
+    
     length = loc_eng_dmn_conn_glue_msgrcv(loc_api_server_msgqid, p_cmsgbuf, sz);
     if (length <= 0) {
-        LOC_LOGE("%s:%d] fail receiving msg from gpsone_daemon, retry later\n", __func__, __LINE__);
+        
         usleep(1000);
         return 0;
     }
 
-    LOC_LOGD("%s:%d] received ctrl_type = %d\n", __func__, __LINE__, p_cmsgbuf->ctrl_type);
+    
     switch(p_cmsgbuf->ctrl_type) {
         case GPSONE_LOC_API_IF_REQUEST:
             result = loc_eng_dmn_conn_loc_api_server_if_request_handler(p_cmsgbuf, length);
@@ -96,12 +96,11 @@ static int loc_api_server_proc(void *context)
             break;
 
         case GPSONE_UNBLOCK:
-            LOC_LOGD("%s:%d] GPSONE_UNBLOCK\n", __func__, __LINE__);
+            
             break;
 
         default:
-            LOC_LOGE("%s:%d] unsupported ctrl_type = %d\n",
-                __func__, __LINE__, p_cmsgbuf->ctrl_type);
+            
             break;
     }
 
@@ -111,7 +110,7 @@ static int loc_api_server_proc(void *context)
 
 static int loc_api_server_proc_post(void *context)
 {
-    LOC_LOGD("%s:%d]\n", __func__, __LINE__);
+    
     loc_eng_dmn_conn_glue_msgremove( global_loc_api_q_path, loc_api_server_msgqid);
     loc_eng_dmn_conn_glue_msgremove( global_loc_api_resp_q_path, loc_api_resp_msgqid);
     return 0;
@@ -121,7 +120,7 @@ static int loc_eng_dmn_conn_unblock_proc(void)
 {
     struct ctrl_msgbuf cmsgbuf;
     cmsgbuf.ctrl_type = GPSONE_UNBLOCK;
-    LOC_LOGD("%s:%d]\n", __func__, __LINE__);
+    
     loc_eng_dmn_conn_glue_msgsnd(loc_api_server_msgqid, & cmsgbuf, sizeof(cmsgbuf));
     return 0;
 }
@@ -146,7 +145,7 @@ int loc_eng_dmn_conn_loc_api_server_launch(thelper_create_thread   create_thread
         create_thread_cb,
         (char *) global_loc_api_q_path);
     if (result != 0) {
-        LOC_LOGE("%s:%d]\n", __func__, __LINE__);
+        
         return -1;
     }
     return 0;
@@ -169,9 +168,9 @@ int loc_eng_dmn_conn_loc_api_server_data_conn(int status) {
   struct ctrl_msgbuf cmsgbuf;
   cmsgbuf.ctrl_type = GPSONE_LOC_API_RESPONSE;
   cmsgbuf.cmsg.cmsg_response.result = status;
-  LOC_LOGD("%s:%d] status = %d",__func__, __LINE__, status);
+  
   if (loc_eng_dmn_conn_glue_msgsnd(loc_api_resp_msgqid, & cmsgbuf, sizeof(struct ctrl_msgbuf)) < 0) {
-    LOC_LOGD("%s:%d] error! conn_glue_msgsnd failed\n", __func__, __LINE__);
+    
     return -1;
   }
   return 0;

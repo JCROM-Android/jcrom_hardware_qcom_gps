@@ -96,9 +96,7 @@ LocEngContext::LocEngContext(gps_create_thread threadCreator) :
     deferred_action_thread(threadCreator("loc_eng",loc_eng_deferred_action_thread, this)),
     counter(0)
 {
-    LOC_LOGV("LocEngContext %d : %d pthread_id %ld\n",
-             getpid(), gettid(),
-             deferred_action_thread);
+
 }
 
 LocEngContext* LocEngContext::get(gps_create_thread threadCreator)
@@ -139,7 +137,7 @@ void LocEngContext::drop()
         }
         pthread_mutex_unlock(&lock);
     } else {
-        LOC_LOGE("The HAL thread cannot free itself");
+    
     }
 }
 
@@ -176,8 +174,6 @@ static int loc_eng_ulp_init(void* handle) ;
     if (!(ctx))                  \
   {                              \
       /* Not intialized, abort */\
-      LOC_LOGE("%s: log_eng state error: %s", __func__, x); \
-      EXIT_LOG(%s, x);                                            \
       ret;                                                        \
   }
 #define INIT_CHECK(ctx, ret) STATE_CHECK(ctx, "instance not initialized", ret)
@@ -192,7 +188,7 @@ static void* loc_eng_create_msg_q()
 {
     void* q = NULL;
     if (eMSG_Q_SUCCESS != msg_q_init(&q)) {
-        LOC_LOGE("loc_eng_create_msg_q Q init failed.");
+        
         q = NULL;
     }
     return q;
@@ -223,11 +219,11 @@ SIDE EFFECTS
 int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
                  LOC_API_ADAPTER_EVENT_MASK_T event)
 {
-    ENTRY_LOG_CALLFLOW();
+    
 
     if (NULL == callbacks || 0 == event) {
-        LOC_LOGE("loc_eng_init: bad parameters cb %p eMask %d", callbacks, event);
-        EXIT_LOG(%d, 0);
+        
+        
         return 0;
     }
 
@@ -273,29 +269,29 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
         ((LocEngContext*)(loc_eng_data.context))->drop();
         loc_eng_data.context = NULL;
     } else {
-        LOC_LOGD("loc_eng_init created client, id = %p\n", loc_eng_data.client_handle);
+        
 
         // call reinit to send initialization messages
        int tries = 30;
        while (tries > 0 &&
               LOC_API_ADAPTER_ERR_SUCCESS != (ret_val = loc_eng_reinit(loc_eng_data))) {
            tries--;
-           LOC_LOGD("loc_eng_init client open failed, %d more tries", tries);
+           
            sleep(1);
        }
     }
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
 static int loc_eng_reinit(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_data.client_handle->reinit();
 
     if (LOC_API_ADAPTER_ERR_SUCCESS == ret_val) {
-        LOC_LOGD("loc_eng_reinit reinit() successful");
+        
 
         loc_eng_msg_suple_version *supl_msg(new loc_eng_msg_suple_version(&loc_eng_data,
                                                                           gps_conf.SUPL_VER));
@@ -327,7 +323,7 @@ static int loc_eng_reinit(loc_eng_data_s_type &loc_eng_data)
                   sensor_perf_control_conf_msg, loc_eng_free_msg);
     }
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -349,7 +345,7 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return);
 
     // XTRA has no state, so we are fine with it.
@@ -368,7 +364,7 @@ void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data)
 #endif
     if (loc_eng_data.navigating)
     {
-        LOC_LOGD("loc_eng_cleanup: fix not stopped. stop it now.");
+        
         loc_eng_stop(loc_eng_data);
     }
 
@@ -386,7 +382,7 @@ void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data)
 
     if (loc_eng_data.client_handle != NULL)
     {
-        LOC_LOGD("loc_eng_init: client opened. close it now.");
+        
         delete loc_eng_data.client_handle;
         loc_eng_data.client_handle = NULL;
     }
@@ -405,7 +401,7 @@ void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data)
 
 #endif
 
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 
@@ -427,20 +423,20 @@ SIDE EFFECTS
 ===========================================================================*/
 int loc_eng_start(loc_eng_data_s_type &loc_eng_data)
 {
-   ENTRY_LOG_CALLFLOW();
+   
    INIT_CHECK(loc_eng_data.context, return -1);
 
    loc_eng_msg *msg(new loc_eng_msg(&loc_eng_data, LOC_ENG_MSG_START_FIX));
    msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
              msg, loc_eng_free_msg);
 
-   EXIT_LOG(%d, 0);
+   
    return 0;
 }
 
 static int loc_eng_start_handler(loc_eng_data_s_type &loc_eng_data)
 {
-   ENTRY_LOG();
+   
    int ret_val = LOC_API_ADAPTER_ERR_SUCCESS;
 
    if (!loc_eng_data.navigating) {
@@ -461,7 +457,7 @@ static int loc_eng_start_handler(loc_eng_data_s_type &loc_eng_data)
        }
    }
 
-   EXIT_LOG(%d, ret_val);
+   
    return ret_val;
 }
 
@@ -483,20 +479,20 @@ SIDE EFFECTS
 ===========================================================================*/
 int loc_eng_stop(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return -1);
 
     loc_eng_msg *msg(new loc_eng_msg(&loc_eng_data, LOC_ENG_MSG_STOP_FIX));
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 
 static int loc_eng_stop_handler(loc_eng_data_s_type &loc_eng_data)
 {
-   ENTRY_LOG();
+   
    int ret_val = LOC_API_ADAPTER_ERR_SUCCESS;
 
    if (loc_eng_data.navigating) {
@@ -517,7 +513,7 @@ static int loc_eng_stop_handler(loc_eng_data_s_type &loc_eng_data)
        loc_eng_data.navigating = FALSE;
    }
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -539,9 +535,9 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_eng_mute_one_session(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG();
+    
     loc_eng_data.mute_session_state = LOC_MUTE_SESS_WAIT;
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -567,7 +563,7 @@ int loc_eng_set_position_mode(loc_eng_data_s_type &loc_eng_data,
                               uint32_t preferred_accuracy,
                               uint32_t preferred_time)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return -1);
     loc_eng_msg_position_mode *msg(
         new loc_eng_msg_position_mode(&loc_eng_data, mode,
@@ -576,7 +572,7 @@ int loc_eng_set_position_mode(loc_eng_data_s_type &loc_eng_data,
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 
@@ -599,7 +595,7 @@ SIDE EFFECTS
 int loc_eng_inject_time(loc_eng_data_s_type &loc_eng_data, GpsUtcTime time,
                         int64_t timeReference, int uncertainty)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return -1);
     loc_eng_msg_set_time *msg(
         new loc_eng_msg_set_time(&loc_eng_data,
@@ -609,7 +605,7 @@ int loc_eng_inject_time(loc_eng_data_s_type &loc_eng_data, GpsUtcTime time,
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 
@@ -633,7 +629,7 @@ SIDE EFFECTS
 int loc_eng_inject_location(loc_eng_data_s_type &loc_eng_data, double latitude,
                             double longitude, float accuracy)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return -1);
     loc_eng_msg_inject_location *msg(
         new loc_eng_msg_inject_location(&loc_eng_data,
@@ -643,7 +639,7 @@ int loc_eng_inject_location(loc_eng_data_s_type &loc_eng_data, double latitude,
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 
@@ -670,7 +666,7 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_eng_delete_aiding_data(loc_eng_data_s_type &loc_eng_data, GpsAidingData f)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return);
 
     loc_eng_msg_delete_aiding_data *msg(
@@ -679,7 +675,7 @@ void loc_eng_delete_aiding_data(loc_eng_data_s_type &loc_eng_data, GpsAidingData
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -700,7 +696,7 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_inform_gps_status(loc_eng_data_s_type &loc_eng_data, GpsStatusValue status)
 {
-    ENTRY_LOG();
+    
 
     static GpsStatusValue last_status = GPS_STATUS_NONE;
 
@@ -709,13 +705,13 @@ static void loc_inform_gps_status(loc_eng_data_s_type &loc_eng_data, GpsStatusVa
 
     if (loc_eng_data.status_cb)
     {
-        CALLBACK_LOG_CALLFLOW("status_cb", %s, loc_get_gps_status_name(gs.status));
+        
         loc_eng_data.status_cb(&gs);
     }
 
     last_status = status;
 
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -736,7 +732,7 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_eng_agps_reinit(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG();
+    
 
     // Set server addresses which came before init
     if (loc_eng_data.supl_host_set)
@@ -752,7 +748,7 @@ static void loc_eng_agps_reinit(loc_eng_data_s_type &loc_eng_data)
                            loc_eng_data.c2k_host_buf,
                            loc_eng_data.c2k_port_buf);
     }
-    EXIT_LOG(%p, VOID_RET);
+    
 }
 /*===========================================================================
 FUNCTION    loc_eng_agps_init
@@ -772,7 +768,7 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsCallbacks* callbacks)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return);
     STATE_CHECK((NULL == loc_eng_data.agps_status_cb),
                 "agps instance already initialized",
@@ -802,7 +798,7 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsCallbacks* callbac
 #endif /* FEATURE_GNSS_BIT_API */
 
     loc_eng_agps_reinit(loc_eng_data);
-    EXIT_LOG(%p, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -826,17 +822,17 @@ SIDE EFFECTS
 int loc_eng_agps_open(loc_eng_data_s_type &loc_eng_data, AGpsType agpsType,
                      const char* apn, AGpsBearerType bearerType)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context && loc_eng_data.agps_status_cb,
                return -1);
 
     if (apn == NULL)
     {
-        LOC_LOGE("APN Name NULL\n");
+        
         return 0;
     }
 
-    LOC_LOGD("loc_eng_agps_open APN name = [%s]", apn);
+    
 
     int apn_len = smaller_of(strlen (apn), MAX_APN_LEN);
     loc_eng_msg_atl_open_success *msg(
@@ -845,24 +841,24 @@ int loc_eng_agps_open(loc_eng_data_s_type &loc_eng_data, AGpsType agpsType,
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 #else
 int loc_eng_agps_open(loc_eng_data_s_type &loc_eng_data,
                      const char* apn)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context && loc_eng_data.agps_status_cb,
                return -1);
 
     if (apn == NULL)
     {
-        LOC_LOGE("APN Name NULL\n");
+        
         return 0;
     }
 
-    LOC_LOGD("loc_eng_agps_open APN name = [%s]", apn);
+    
 
     int apn_len = smaller_of(strlen (apn), MAX_APN_LEN);
     loc_eng_msg_atl_open_success *msg(
@@ -871,7 +867,7 @@ int loc_eng_agps_open(loc_eng_data_s_type &loc_eng_data,
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 #endif
@@ -896,7 +892,7 @@ SIDE EFFECTS
 #ifdef QCOM_FEATURE_IPV6
 int loc_eng_agps_closed(loc_eng_data_s_type &loc_eng_data, AGpsType agpsType)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context && loc_eng_data.agps_status_cb,
                return -1);
 
@@ -904,13 +900,13 @@ int loc_eng_agps_closed(loc_eng_data_s_type &loc_eng_data, AGpsType agpsType)
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 #else
 int loc_eng_agps_closed(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context && loc_eng_data.agps_status_cb,
                return -1);
 
@@ -918,7 +914,7 @@ int loc_eng_agps_closed(loc_eng_data_s_type &loc_eng_data)
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 #endif
@@ -943,7 +939,7 @@ SIDE EFFECTS
 #ifdef QCOM_FEATURE_IPV6
 int loc_eng_agps_open_failed(loc_eng_data_s_type &loc_eng_data, AGpsType agpsType)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context && loc_eng_data.agps_status_cb,
                return -1);
 
@@ -951,13 +947,13 @@ int loc_eng_agps_open_failed(loc_eng_data_s_type &loc_eng_data, AGpsType agpsTyp
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 #else
 int loc_eng_agps_open_failed(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context && loc_eng_data.agps_status_cb,
                return -1);
 
@@ -965,7 +961,7 @@ int loc_eng_agps_open_failed(loc_eng_data_s_type &loc_eng_data)
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 #endif
@@ -989,7 +985,7 @@ SIDE EFFECTS
 ===========================================================================*/
 static boolean resolve_in_addr(const char *host_addr, struct in_addr *in_addr_ptr)
 {
-    ENTRY_LOG();
+    
     boolean ret_val = TRUE;
 
     struct hostent             *hp;
@@ -1004,12 +1000,12 @@ static boolean resolve_in_addr(const char *host_addr, struct in_addr *in_addr_pt
         if (inet_aton(host_addr, in_addr_ptr) == 0)
         {
             /* IP not valid */
-            LOC_LOGE("DNS query on '%s' failed\n", host_addr);
+            
             ret_val = FALSE;
         }
     }
 
-    EXIT_LOG(%s, loc_logger_boolStr[ret_val!=0]);
+    
     return ret_val;
 }
 
@@ -1033,7 +1029,7 @@ SIDE EFFECTS
 static int loc_eng_set_server(loc_eng_data_s_type &loc_eng_data,
                               LocServerType type, const char* hostname, int port)
 {
-    ENTRY_LOG();
+    
     int ret = 0;
 
     if (LOC_AGPS_SUPL_SERVER == type) {
@@ -1052,7 +1048,7 @@ static int loc_eng_set_server(loc_eng_data_s_type &loc_eng_data,
         struct in_addr addr;
         if (!resolve_in_addr(hostname, &addr))
         {
-            LOC_LOGE("loc_eng_set_server, hostname %s cannot be resolved.\n", hostname);
+            
             ret = -2;
         } else {
             unsigned int ip = htonl(addr.s_addr);
@@ -1064,10 +1060,10 @@ static int loc_eng_set_server(loc_eng_data_s_type &loc_eng_data,
                       msg, loc_eng_free_msg);
         }
     } else {
-        LOC_LOGE("loc_eng_set_server, type %d cannot be resolved.\n", type);
+        
     }
 
-    EXIT_LOG(%d, ret);
+    
     return ret;
 }
 
@@ -1093,15 +1089,15 @@ int loc_eng_set_server_proxy(loc_eng_data_s_type &loc_eng_data,
                              LocServerType type,
                              const char* hostname, int port)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     int ret_val = 0;
 
     if (NULL != loc_eng_data.context)
     {
         ret_val = loc_eng_set_server(loc_eng_data, type, hostname, port);
     } else {
-        LOC_LOGW("set_server called before init. save the address, type: %d, hostname: %s, port: %d",
-                 (int) type, hostname, port);
+        
+
         switch (type)
         {
         case LOC_AGPS_SUPL_SERVER:
@@ -1117,11 +1113,11 @@ int loc_eng_set_server_proxy(loc_eng_data_s_type &loc_eng_data,
             loc_eng_data.c2k_host_set = 1;
             break;
         default:
-            LOC_LOGE("loc_eng_set_server_proxy, unknown server type = %d", (int) type);
+	  break;
         }
     }
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -1145,18 +1141,18 @@ SIDE EFFECTS
 void loc_eng_agps_ril_update_network_availability(loc_eng_data_s_type &loc_eng_data,
                                                   int available, const char* apn)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return);
     if (apn != NULL)
     {
-        LOC_LOGD("loc_eng_agps_ril_update_network_availability: APN Name = [%s]\n", apn);
+        
         int apn_len = smaller_of(strlen (apn), MAX_APN_LEN);
         loc_eng_msg_set_data_enable *msg(new loc_eng_msg_set_data_enable(&loc_eng_data, apn,
                                                                          apn_len, available));
         msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
                   msg, loc_eng_free_msg);
     }
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -1177,13 +1173,13 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_eng_report_status (loc_eng_data_s_type &loc_eng_data, GpsStatusValue status)
 {
-    ENTRY_LOG();
+    
     // Switch from WAIT to MUTE, for "engine on" or "session begin" event
     if (status == GPS_STATUS_SESSION_BEGIN || status == GPS_STATUS_ENGINE_ON)
     {
         if (loc_eng_data.mute_session_state == LOC_MUTE_SESS_WAIT)
         {
-            LOC_LOGD("loc_eng_report_status: mute_session_state changed from WAIT to IN SESSION");
+            
             loc_eng_data.mute_session_state = LOC_MUTE_SESS_IN_SESSION;
         }
     }
@@ -1192,7 +1188,7 @@ static void loc_eng_report_status (loc_eng_data_s_type &loc_eng_data, GpsStatusV
     if (loc_eng_data.mute_session_state == LOC_MUTE_SESS_IN_SESSION &&
         (status == GPS_STATUS_SESSION_END || status == GPS_STATUS_ENGINE_OFF))
     {
-        LOC_LOGD("loc_eng_report_status: mute_session_state changed from IN SESSION to NONE");
+        
         loc_eng_data.mute_session_state = LOC_MUTE_SESS_NONE;
     }
 
@@ -1207,7 +1203,7 @@ static void loc_eng_report_status (loc_eng_data_s_type &loc_eng_data, GpsStatusV
             loc_inform_gps_status(loc_eng_data, status);
         }
         else {
-            LOC_LOGD("loc_eng_report_status: muting the status report.");
+            
         }
     }
 
@@ -1222,7 +1218,7 @@ static void loc_eng_report_status (loc_eng_data_s_type &loc_eng_data, GpsStatusV
     {
         loc_eng_data.fix_session_status = status;
     }
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -1246,15 +1242,15 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_eng_handle_engine_down(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG();
+    
     loc_eng_ni_reset_on_engine_restart(loc_eng_data);
     loc_eng_report_status(loc_eng_data, GPS_STATUS_ENGINE_OFF);
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 void loc_eng_handle_engine_up(loc_eng_data_s_type &loc_eng_data)
 {
-    ENTRY_LOG();
+    
     loc_eng_reinit(loc_eng_data);
 
     if (loc_eng_data.agps_status_cb != NULL) {
@@ -1278,7 +1274,7 @@ void loc_eng_handle_engine_up(loc_eng_data_s_type &loc_eng_data)
         // stop call in between.
         loc_eng_start_handler(loc_eng_data);
     }
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -1299,7 +1295,7 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_eng_deferred_action_thread(void* arg)
 {
-    ENTRY_LOG();
+    
     loc_eng_msg *msg;
     static int cnt = 0;
     LocEngContext* context = (LocEngContext*)arg;
@@ -1309,20 +1305,18 @@ static void loc_eng_deferred_action_thread(void* arg)
 
     while (1)
     {
-        LOC_LOGD("%s:%d] %d listening ...\n", __func__, __LINE__, cnt++);
+        
 
         // we are only sending / receiving msg pointers
         msq_q_err_type result = msg_q_rcv((void*)context->deferred_q, (void **) &msg);
         if (eMSG_Q_SUCCESS != result) {
-            LOC_LOGE("%s:%d] fail receiving msg: %s\n", __func__, __LINE__,
-                     loc_get_msg_q_status(result));
+            
             return;
         }
 
         loc_eng_data_s_type* loc_eng_data_p = (loc_eng_data_s_type*)msg->owner;
 
-        LOC_LOGD("%s:%d] received msg_id = %s context = %p\n",
-                 __func__, __LINE__, loc_get_msg_name(msg->msgid), loc_eng_data_p->context);
+        
 
         // need to ensure the instance data is valid
         STATE_CHECK(NULL != loc_eng_data_p->context,
@@ -1336,7 +1330,7 @@ static void loc_eng_deferred_action_thread(void* arg)
             pthread_mutex_lock(&(context->lock));
             pthread_cond_signal(&(context->cond));
             pthread_mutex_unlock(&(context->lock));
-            EXIT_LOG(%s, "LOC_ENG_MSG_QUIT, signal the main thread and return");
+            
         }
         return;
 
@@ -1363,7 +1357,7 @@ static void loc_eng_deferred_action_thread(void* arg)
             if (loc_eng_data_p->agps_request_pending)
             {
                 loc_eng_data_p->stop_request_pending = true;
-                LOC_LOGD("loc_eng_stop - deferring stop until AGPS data call is finished\n");
+                
             } else {
                 loc_eng_stop_handler(*loc_eng_data_p);
             }
@@ -1491,7 +1485,7 @@ static void loc_eng_deferred_action_thread(void* arg)
                 struct timeval tv;
                 gettimeofday(&tv, (struct timezone *) NULL);
                 int64_t now = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
-                CALLBACK_LOG_CALLFLOW("nmea_cb", %p, nmMsg->nmea);
+                
                 loc_eng_data_p->nmea_cb(now, nmMsg->nmea, nmMsg->length);
             }
             break;
@@ -1639,7 +1633,7 @@ static void loc_eng_deferred_action_thread(void* arg)
             break;
 
         default:
-            LOC_LOGE("unsupported msgid = %d\n", msg->msgid);
+            
             break;
         }
 
@@ -1665,7 +1659,7 @@ static void loc_eng_deferred_action_thread(void* arg)
         delete msg;
     }
 
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -1691,7 +1685,7 @@ static int loc_eng_report_position_ulp (void* handle,
                                         unsigned int   ext_data_length,
                                         unsigned char* ext_data)
 {
-    ENTRY_LOG();
+    
     loc_eng_data_s_type* loc_eng_data_p = (loc_eng_data_s_type*)handle;
 
     INIT_CHECK(loc_eng_data_p->context && loc_eng_data_p->client_handle,
@@ -1709,7 +1703,7 @@ static int loc_eng_report_position_ulp (void* handle,
     loc_eng_data_p->client_handle->reportPosition((GpsLocation&)*location_report_ptr,
                                                   NULL, LOC_SESS_SUCCESS);
 
-    EXIT_LOG(%d, 0);
+    
     return 0;
 }
 
@@ -1734,14 +1728,14 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_eng_ulp_init(void* owner)
 {
-    ENTRY_LOG();
+    
     int ret_val;
     void *handle;
     const char *error;
     get_ulp_interface* get_ulp_inf;
 
     if (!(gps_conf.CAPABILITIES & ULP_CAPABILITY)) {
-       LOC_LOGD ("%s, ULP is not supported\n", __func__);
+       
        ret_val = -1;
        goto exit;
     }
@@ -1749,7 +1743,7 @@ static int loc_eng_ulp_init(void* owner)
     handle = dlopen ("libulp.so", RTLD_NOW);
     if (!handle)
     {
-        LOC_LOGE ("%s, dlopen for libulp.so failed\n", __func__);
+        
         ret_val = -1;
         goto exit;
     }
@@ -1757,7 +1751,7 @@ static int loc_eng_ulp_init(void* owner)
 
     get_ulp_inf = (get_ulp_interface*) dlsym(handle, "ulp_get_interface");
     if ((error = dlerror()) != NULL)  {
-        LOC_LOGE ("%s, dlsym for ulpInterface failed, error = %s\n", __func__, error);
+        
         ret_val = -1;
         goto exit;
     }
@@ -1769,7 +1763,7 @@ static int loc_eng_ulp_init(void* owner)
 
     ret_val = 0;
 exit:
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -1792,13 +1786,13 @@ SIDE EFFECTS
 bool loc_eng_inject_raw_command(loc_eng_data_s_type &loc_eng_data,
                                 char* command, int length)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return -1);
     boolean ret_val;
-    LOC_LOGD("loc_eng_send_extra_command: %s\n", command);
+    
     ret_val = TRUE;
 
-    EXIT_LOG(%s, loc_logger_boolStr[ret_val!=0]);
+    
     return ret_val;
 }
 /*===========================================================================
@@ -1820,12 +1814,12 @@ SIDE EFFECTS
 int loc_eng_update_criteria(loc_eng_data_s_type &loc_eng_data,
                             UlpLocationCriteria criteria)
 {
-    ENTRY_LOG_CALLFLOW();
+    
     INIT_CHECK(loc_eng_data.context, return -1);
     int ret_val;
     ret_val = 0;
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #endif

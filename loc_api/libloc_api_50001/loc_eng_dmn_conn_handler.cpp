@@ -40,10 +40,10 @@ void* loc_api_handle = NULL;
 
 int loc_eng_dmn_conn_loc_api_server_if_request_handler(struct ctrl_msgbuf *pmsg, int len)
 {
-    LOC_LOGD("%s:%d]\n", __func__, __LINE__);
+   
 #ifndef DEBUG_DMN_LOC_API
     if (NULL == loc_api_handle) {
-        LOC_LOGE("%s:%d] NO agps data handle\n", __func__, __LINE__);
+        
         return 1;
     }
 
@@ -62,7 +62,7 @@ int loc_eng_dmn_conn_loc_api_server_if_request_handler(struct ctrl_msgbuf *pmsg,
 
 int loc_eng_dmn_conn_loc_api_server_if_release_handler(struct ctrl_msgbuf *pmsg, int len)
 {
-    LOC_LOGD("%s:%d]\n", __func__, __LINE__);
+    
 #ifndef DEBUG_DMN_LOC_API
     loc_eng_msg_release_bit *msg(
             new loc_eng_msg_release_bit(loc_api_handle,

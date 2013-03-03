@@ -53,18 +53,18 @@ LocEng::LocEng(void* caller,
         extPosInfo(NULL == posParser ? noProc : posParser),
         extSvInfo(NULL == svParser ? noProc : svParser)
 {
-    LOC_LOGV("LocEng constructor %p, %p", posParser, svParser);
+
 }
 
 LocApiAdapter::LocApiAdapter(LocEng &locEng) :
     locEngHandle(locEng)
 {
-    LOC_LOGD("LocApiAdapter created");
+
 }
 
 LocApiAdapter::~LocApiAdapter()
 {
-    LOC_LOGV("LocApiAdapter deleted");
+
 }
 
 LocApiAdapter* LocApiAdapter::getLocApiAdapter(LocEng &locEng)
@@ -75,19 +75,19 @@ LocApiAdapter* LocApiAdapter::getLocApiAdapter(LocEng &locEng)
     handle = dlopen ("libloc_api_v02.so", RTLD_NOW);
 
     if (!handle) {
-        LOC_LOGI("%s: dlopen(libloc_api_v02.so) failed, trying to load libloc_api-rpc-qc.so", __FUNCTION__);
+        
         handle = dlopen ("libloc_api-rpc-qc.so", RTLD_NOW);
     }
     else
-        LOC_LOGE("%s: dlopen(libloc_api_v02.so) succeeded.", __FUNCTION__);
+       
 
     if (!handle) {
-        LOC_LOGI("%s: dlopen(libloc_api-rpc-qc.so) failed, constructing LocApiAdapter", __FUNCTION__);
+        
         adapter = new LocApiAdapter(locEng);
     } else {
         getLocApiAdapter_t* getHandle = (getLocApiAdapter_t*)dlsym(handle, "getLocApiAdapter");
         if (!getHandle) {
-            LOC_LOGE("%s: dlsym(getLocApiAdapter) failed", __FUNCTION__);
+            
             return NULL;
         }
         adapter = (*getHandle)(locEng);
@@ -124,7 +124,7 @@ int LocApiAdapter::decodeAddress(char *addr_string, int string_size,
 
     if (data[0] != addr_prefix)
     {
-        LOC_LOGW("decodeAddress: address prefix is not 0x%x but 0x%x", addr_prefix, data[0]);
+        
         addr_string[0] = '\0';
         return 0; // prefix not correct
     }
@@ -184,7 +184,7 @@ void LocApiAdapter::releaseATL(int connHandle)
 
 void LocApiAdapter::requestXtraData()
 {
-    LOC_LOGD("XTRA download request");
+    
 
     loc_eng_msg *msg(new loc_eng_msg(locEngHandle.owner, LOC_ENG_MSG_REQUEST_XTRA_DATA));
     locEngHandle.sendMsge(locEngHandle.owner, msg);
@@ -192,14 +192,14 @@ void LocApiAdapter::requestXtraData()
 
 void LocApiAdapter::requestTime()
 {
-    LOC_LOGD("loc_event_cb: XTRA time download request... not supported");
+    
     // loc_eng_msg *msg(new loc_eng_msg(locEngHandle.owner, LOC_ENG_MSG_REQUEST_TIME));
     // locEngHandle.sendMsge(locEngHandle.owner, msg);
 }
 
 void LocApiAdapter::requestLocation()
 {
-    LOC_LOGD("loc_event_cb: XTRA time download request... not supported");
+    
     // loc_eng_msg *msg(new loc_eng_msg(locEngHandle.owner, LOC_ENG_MSG_REQUEST_POSITION));
     // locEngHandle.sendMsge(locEngHandle.owner, msg);
 }

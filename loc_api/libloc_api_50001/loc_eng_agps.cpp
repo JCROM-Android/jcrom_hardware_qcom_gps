@@ -196,7 +196,7 @@ public:
 AgpsState* AgpsReleasedState::onRsrcEvent(AgpsRsrcStatus event, void* data)
 {
     if (mStateMachine->hasSubscribers()) {
-        LOC_LOGE("Error: %s subscriber list not empty!!!", whoami());
+        
         // I don't know how to recover from it.  I am adding this rather
         // for debugging purpose.
     }
@@ -231,13 +231,12 @@ AgpsState* AgpsReleasedState::onRsrcEvent(AgpsRsrcStatus event, void* data)
     case RSRC_RELEASED:
     case RSRC_DENIED:
     default:
-        LOC_LOGW("%s: unrecognized event %d", whoami(), event);
+        
         // no state change.
         break;
     }
 
-    LOC_LOGD("onRsrcEvent, old state %s, new state %s, event %d",
-             whoami(), nextState->whoami(), event);
+    
     return nextState;
 }
 
@@ -324,12 +323,11 @@ AgpsState* AgpsPendingState::onRsrcEvent(AgpsRsrcStatus event, void* data)
         break;
 
     default:
-        LOC_LOGE("%s: unrecognized event %d", whoami(), event);
+      break;
         // no state change.
     }
 
-    LOC_LOGD("onRsrcEvent, old state %s, new state %s, event %d",
-             whoami(), nextState->whoami(), event);
+    
     return nextState;
 }
 
@@ -396,13 +394,13 @@ AgpsState* AgpsAcquiredState::onRsrcEvent(AgpsRsrcStatus event, void* data)
         break;
 
     case RSRC_GRANTED:
-        LOC_LOGW("%s: %d, RSRC_GRANTED already received", whoami(), event);
+        
         // no state change.
         break;
 
     case RSRC_RELEASED:
     {
-        LOC_LOGW("%s: %d, a force rsrc release", whoami(), event);
+        
         nextState = mReleasedState;
         Notification notification(Notification::BROADCAST_ALL, event, true);
         // by setting true, we remove subscribers from the linked list
@@ -417,12 +415,11 @@ AgpsState* AgpsAcquiredState::onRsrcEvent(AgpsRsrcStatus event, void* data)
         break;
 
     default:
-        LOC_LOGE("%s: unrecognized event %d", whoami(), event);
+      break;
         // no state change.
     }
 
-    LOC_LOGD("onRsrcEvent, old state %s, new state %s, event %d",
-             whoami(), nextState->whoami(), event);
+    
     return nextState;
 }
 
@@ -505,12 +502,11 @@ AgpsState* AgpsReleasingState::onRsrcEvent(AgpsRsrcStatus event, void* data)
     case RSRC_GRANTED:
     case RSRC_DENIED:
     default:
-        LOC_LOGE("%s: unrecognized event %d", whoami(), event);
+      break;
         // no state change.
     }
 
-    LOC_LOGD("onRsrcEvent, old state %s, new state %s, event %d",
-             whoami(), nextState->whoami(), event);
+    
     return nextState;
 }
 
@@ -601,7 +597,7 @@ void AgpsStateMachine::onRsrcEvent(AgpsRsrcStatus event)
         mStatePtr = mStatePtr->onRsrcEvent(event, NULL);
         break;
     default:
-        LOC_LOGW("AgpsStateMachine: unrecognized event %d", event);
+        
         break;
     }
 }
@@ -668,7 +664,7 @@ void AgpsStateMachine::sendRsrcRequest(AGpsStatusValue action) const
         }
 #endif
 
-        CALLBACK_LOG_CALLFLOW("agps_cb", %s, loc_get_agps_status_name(action));
+        
         (*mServicer)(&nifRequest);
     }
 }

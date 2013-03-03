@@ -190,11 +190,11 @@ void loc_read_gps_conf(void)
 
    if((gps_conf_fp = fopen(GPS_CONF_FILE, "r")) != NULL)
    {
-      LOC_LOGD("%s: using %s", __FUNCTION__, GPS_CONF_FILE);
+     //LOC_LOGD("%s: using %s", __FUNCTION__, GPS_CONF_FILE);
    }
    else
    {
-      LOC_LOGW("%s: no %s file, using defaults", __FUNCTION__, GPS_CONF_FILE);
+     //LOC_LOGW("%s: no %s file, using defaults", __FUNCTION__, GPS_CONF_FILE);
       return; /* no parameter file */
    }
 
@@ -246,20 +246,21 @@ void loc_read_gps_conf(void)
                         LOC_MAX_PARAM_STRING + 1);
                }
                /* Log INI values */
-               LOC_LOGD("%s: PARAM %s = %s", __FUNCTION__, param_name, (char*)loc_parameter_table[i].param_ptr);
+               //LOC_LOGD("%s: PARAM %s = %s", __FUNCTION__, param_name, (char*)loc_parameter_table[i].param_ptr);
                break;
             case 'n':
                *((int *)loc_parameter_table[i].param_ptr) = param_int_value;
                /* Log INI values */
-               LOC_LOGD("%s: PARAM %s = %d", __FUNCTION__, param_name, param_int_value);
+               //LOC_LOGD("%s: PARAM %s = %d", __FUNCTION__, param_name, param_int_value);
                break;
             case 'f':
                *((double *)loc_parameter_table[i].param_ptr) = param_double_value;
                /* Log INI values */
-               LOC_LOGD("%s: PARAM %s = %f", __FUNCTION__, param_name, param_double_value);
+               //LOC_LOGD("%s: PARAM %s = %f", __FUNCTION__, param_name, param_double_value);
                break;
             default:
-               LOC_LOGE("%s: PARAM %s parameter type must be n or n", __FUNCTION__, param_name);
+	      //LOC_LOGE("%s: PARAM %s parameter type must be n or n", __FUNCTION__, param_name);
+	      break;
             }
          }
       }

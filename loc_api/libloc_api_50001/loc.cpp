@@ -167,7 +167,7 @@ SIDE EFFECTS
 ===========================================================================*/
 const GpsInterface* gps_get_hardware_interface ()
 {
-    ENTRY_LOG_CALLFLOW();
+
     const GpsInterface* ret_val;
 
     char propBuf[PROPERTY_VALUE_MAX];
@@ -176,13 +176,13 @@ const GpsInterface* gps_get_hardware_interface ()
     property_get("gps.disable", propBuf, "");
     if (propBuf[0] == '1')
     {
-        LOC_LOGD("gps_get_interface returning NULL because gps.disable=1\n");
+        
         ret_val = NULL;
     } else {
         ret_val = &sLocEngInterface;
     }
 
-    EXIT_LOG(%p, ret_val);
+    
     return ret_val;
 }
 
@@ -210,7 +210,7 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_init(GpsCallbacks* callbacks)
 {
-    ENTRY_LOG();
+    
     LOC_API_ADAPTER_EVENT_MASK_T event =
         LOC_API_ADAPTER_BIT_PARSED_POSITION_REPORT |
         LOC_API_ADAPTER_BIT_SATELLITE_REPORT |
@@ -235,7 +235,7 @@ static int loc_init(GpsCallbacks* callbacks)
 
     int ret_val = loc_eng_init(loc_afw_data, &clientCallbacks, event);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -257,11 +257,11 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_cleanup()
 {
-    ENTRY_LOG();
+    
     loc_eng_cleanup(loc_afw_data);
     gps_loc_cb = NULL;
     gps_sv_cb = NULL;
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -282,10 +282,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_start()
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_start(loc_afw_data);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -307,10 +307,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_stop()
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_stop(loc_afw_data);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -336,7 +336,7 @@ static int  loc_set_position_mode(GpsPositionMode mode,
                                   uint32_t preferred_accuracy,
                                   uint32_t preferred_time)
 {
-    ENTRY_LOG();
+    
     LocPositionMode locMode;
     switch (mode) {
     case GPS_POSITION_MODE_MS_BASED:
@@ -353,7 +353,7 @@ static int  loc_set_position_mode(GpsPositionMode mode,
                                             recurrence, min_interval,
                                             preferred_accuracy, preferred_time);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -375,10 +375,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_inject_time(GpsUtcTime time, int64_t timeReference, int uncertainty)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_inject_time(loc_afw_data, time, timeReference, uncertainty);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -401,10 +401,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_inject_location(double latitude, double longitude, float accuracy)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_inject_location(loc_afw_data, latitude, longitude, accuracy);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -431,10 +431,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_delete_aiding_data(GpsAidingData f)
 {
-    ENTRY_LOG();
+    
     loc_eng_delete_aiding_data(loc_afw_data, f);
 
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 #ifdef QCOM_FEATURE_ULP
@@ -456,10 +456,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_update_criteria(UlpLocationCriteria criteria)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_update_criteria(loc_afw_data, criteria);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #endif
@@ -482,7 +482,7 @@ SIDE EFFECTS
 ===========================================================================*/
 static const void* loc_get_extension(const char* name)
 {
-    ENTRY_LOG();
+    
     const void* ret_val = NULL;
 
    if (strcmp(name, GPS_XTRA_INTERFACE) == 0)
@@ -512,10 +512,10 @@ static const void* loc_get_extension(const char* name)
 #endif
    else
    {
-      LOC_LOGE ("get_extension: Invalid interface passed in\n");
+      
    }
 
-    EXIT_LOG(%p, ret_val);
+    
     return ret_val;
 }
 
@@ -537,9 +537,9 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_agps_init(AGpsCallbacks* callbacks)
 {
-    ENTRY_LOG();
+    
     loc_eng_agps_init(loc_afw_data, callbacks);
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -563,19 +563,19 @@ SIDE EFFECTS
 static int loc_agps_open(AGpsType agpsType,
                          const char* apn, AGpsBearerType bearerType)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_agps_open(loc_afw_data, agpsType, apn, bearerType);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #else
 static int loc_agps_open(const char* apn)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_agps_open(loc_afw_data, apn);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #endif
@@ -600,19 +600,19 @@ SIDE EFFECTS
 #ifdef QCOM_FEATURE_IPV6
 static int loc_agps_closed(AGpsType agpsType)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_agps_closed(loc_afw_data, agpsType);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #else
 static int loc_agps_closed()
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_agps_closed(loc_afw_data);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #endif
@@ -637,19 +637,19 @@ SIDE EFFECTS
 #ifdef QCOM_FEATURE_IPV6
 int loc_agps_open_failed(AGpsType agpsType)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_agps_open_failed(loc_afw_data, agpsType);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #else
 int loc_agps_open_failed()
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_agps_open_failed(loc_afw_data);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 #endif
@@ -674,7 +674,7 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_agps_set_server(AGpsType type, const char* hostname, int port)
 {
-    ENTRY_LOG();
+    
     LocServerType serverType;
     switch (type) {
     case AGPS_TYPE_SUPL:
@@ -686,7 +686,7 @@ static int loc_agps_set_server(AGpsType type, const char* hostname, int port)
     }
     int ret_val = loc_eng_set_server_proxy(loc_afw_data, serverType, hostname, port);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -708,10 +708,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_xtra_init(GpsXtraCallbacks* callbacks)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_xtra_init(loc_afw_data, callbacks);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -734,10 +734,10 @@ SIDE EFFECTS
 ===========================================================================*/
 static int loc_xtra_inject_data(char* data, int length)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_xtra_inject_data(loc_afw_data, data, length);
 
-    EXIT_LOG(%d, ret_val);
+    
     return ret_val;
 }
 
@@ -759,9 +759,9 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_ni_init(GpsNiCallbacks *callbacks)
 {
-    ENTRY_LOG();
+    
     loc_eng_ni_init(loc_afw_data, callbacks);
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 /*===========================================================================
@@ -782,9 +782,9 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_ni_respond(int notif_id, GpsUserResponseType user_response)
 {
-    ENTRY_LOG();
+    
     loc_eng_ni_respond(loc_afw_data, notif_id, user_response);
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 // Below stub functions are members of sLocEngAGpsRilInterface
@@ -813,9 +813,9 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_agps_ril_update_network_availability(int available, const char* apn)
 {
-    ENTRY_LOG();
+    
     loc_eng_agps_ril_update_network_availability(loc_afw_data, available, apn);
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 #ifdef QCOM_FEATURE_ULP
@@ -837,9 +837,9 @@ SIDE EFFECTS
 ===========================================================================*/
 static bool loc_inject_raw_command(char* command, int length)
 {
-    ENTRY_LOG();
+    
     int ret_val = loc_eng_inject_raw_command(loc_afw_data, command, length);
-    EXIT_LOG(%s, loc_logger_boolStr[ret_val!=0]);
+    
     return ret_val;
 }
 #endif
@@ -847,24 +847,24 @@ static bool loc_inject_raw_command(char* command, int length)
 
 static void loc_cb(GpsLocation* location, void* locExt)
 {
-    ENTRY_LOG();
+    
     if (NULL != gps_loc_cb && NULL != location) {
 #ifdef QCOM_FEATURE_ULP
-        CALLBACK_LOG_CALLFLOW("location_cb - from", %d, location->position_source);
+        
 #else
-        CALLBACK_LOG_CALLFLOW("location_cb - at", %llu, location->timestamp);
+
 #endif
         gps_loc_cb(location);
     }
-    EXIT_LOG(%s, VOID_RET);
+    
 }
 
 static void sv_cb(GpsSvStatus* sv_status, void* svExt)
 {
-    ENTRY_LOG();
+    
     if (NULL != gps_sv_cb) {
-        CALLBACK_LOG_CALLFLOW("sv_status_cb -", %d, sv_status->num_svs);
+        
         gps_sv_cb(sv_status);
     }
-    EXIT_LOG(%s, VOID_RET);
+    
 }
